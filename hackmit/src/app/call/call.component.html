@@ -1,13 +1,20 @@
-<section>
-    <div class="participants">
-        <ng-container
-        *ngFor="let participant of participants(); trackBy: trackBySessionId">
-            <app-participant [participant]="participant"></app-participant>
-        </ng-container>
+<section class="video-conference">
+    <div class="participants-grid">
+      <ng-container *ngFor="let participant of participants(); trackBy: trackBySessionId">
+        <div class="participant-wrapper">
+          <app-participant [participant]="participant"></app-participant>
+        </div>
+      </ng-container>
     </div>
     <div class="call-controls">
-        <button (click)="toggleMicrophone()">Mic</button>
-        <button (click)="toggleCamera()">Camera</button>
-        <button class="leave-button" (click)="leaveCall()">Leave</button>
+      <button class="control-btn mic-btn" (click)="toggleMicrophone()">
+        <span class="material-icons">{{this.call.microphone.enabled ? 'mic' : 'mic_off'}}</span>
+      </button>
+      <button class="control-btn camera-btn" (click)="toggleCamera()">
+        <span class="material-icons">{{this.call.camera.enabled ? 'videocam' : 'videocam_off'}}</span>
+      </button>
+      <button class="control-btn leave-btn" (click)="leaveCall()">
+        <span class="material-icons">call_end</span>
+      </button>
     </div>
-</section>
+  </section>

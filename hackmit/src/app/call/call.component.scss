@@ -1,32 +1,103 @@
-section {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+.video-conference {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #000;
+}
+
+.participants-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
   }
   
-  .participants {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  .participant-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .participant-wrapper app-participant {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+.call-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50px;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-btn .material-icons {
+  font-size: 24px;
+}
+
+.mic-btn, .camera-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.mic-btn:hover, .camera-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.leave-btn {
+  background-color: #ff4136;
+  color: #fff;
+}
+
+.leave-btn:hover {
+  background-color: #ff1a1a;
+}
+
+@media (max-width: 768px) {
+  .participants-grid {
+    grid-template-columns: 1fr;
   }
   
   .call-controls {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    padding: 0 0.5rem;
+    bottom: 10px;
   }
   
-  button {
-    font-size: smaller;
+  .control-btn {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
   }
   
-  .leave-button {
-    background: var(--custom-red);
+  .control-btn .material-icons {
+    font-size: 20px;
   }
-  
-  .leave-button:hover {
-    background: var(--custom-red-hover);
-  }
+}
