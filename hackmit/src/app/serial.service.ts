@@ -74,7 +74,6 @@ export class SerialService {
           let utf8decoder = new TextDecoder();
           let in_char = utf8decoder.decode(value);
           if (!isNaN(parseFloat(in_char))) {
-            console.log(parseFloat(in_char));
             this.dataSubject.next(parseFloat(in_char));
           }
         }

@@ -4,6 +4,7 @@ import { CallingService } from '../calling.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ParticipantComponent } from '../participant/participant.component';
+import { SerialService } from '../serial.service';
 
 @Component({
   selector: 'app-call',
@@ -16,7 +17,10 @@ export class CallComponent {
   @Input({ required: true }) call!: Call;
   participants: Signal<StreamVideoParticipant[]>;
 
-  constructor(private callingService: CallingService) {
+  constructor(
+    private callingService: CallingService,
+    private serialService: SerialService
+  ) {
     this.participants = toSignal(
       this.callingService.call()!.state.participants$,
       { requireSync: true }
@@ -37,5 +41,6 @@ export class CallComponent {
 
   leaveCall() {
     this.callingService.setCallId(undefined);
+    this.serialService.close();
   }
 }

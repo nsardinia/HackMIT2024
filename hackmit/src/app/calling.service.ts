@@ -23,6 +23,10 @@ export class CallingService {
         call.microphone.enable();
         this.initializeSensorChannel(currentCallId); // Initialize sensor data channel
       });
+      this.chatClient.connectUser(
+        { id: api_keys.user }, // Current user (doctor or patient)
+        api_keys.token
+      );
       return call;
     } else {
       return undefined;
@@ -41,10 +45,6 @@ export class CallingService {
 
     // Initialize Stream Chat client
     this.chatClient = new StreamChat(apiKey);
-    this.chatClient.connectUser(
-      { id: api_keys.user }, // Current user (doctor or patient)
-      token
-    );
   }
 
   // Create or join a channel for sensor data
@@ -79,6 +79,7 @@ export class CallingService {
   setCallId(callId: string | undefined) {
     if (callId === undefined) {
       this.call()?.leave();
+      this.chatClient.disconnectUser();
     }
     this.callId.set(callId);
   }

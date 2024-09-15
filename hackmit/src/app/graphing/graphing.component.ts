@@ -80,8 +80,6 @@ export class GraphingComponent implements OnInit, OnDestroy {
     if (this.array.length == this.windowLength) {
       this.startRealtimeUpdate();
     }
-
-    console.log(this.window);
   }
 
   // Clean up the interval when the component is destroyed

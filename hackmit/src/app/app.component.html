@@ -3,7 +3,7 @@
     <h1 class="text-blue-500 text-6xl font-bold mb-8">Flexi-Care</h1>
     
     <div class="bg-white p-4 rounded shadow-md w-96">
-      <h1 class="text-center text-2xl font-bold mb-6">Prepare for Your Meeting</h1>
+      <h1 class="text-center text-2xl font-bold mb-6">Prepare for Your Appointment</h1>
       <div class="border p-4 mb-6">
         <div class="flex items-center justify-between mb-4">
           <span>1. Pair the device</span>
@@ -48,6 +48,6 @@
 </section>
 <section *ngIf="callingService.call()">
   <app-call [call]="callingService.call()!"></app-call>
-  <app-graphing></app-graphing>
+  <app-graphing ></app-graphing>
 </section>
 <router-outlet />
