@@ -77,13 +77,16 @@ export class GraphingComponent implements OnInit, OnDestroy {
   }
 
   handleIncomingData(chunk: string): void {
+    console.log('Incoming chunk: ' + chunk);
     this.dataBuffer += chunk;
+    console.log('Databuffer (before) :' + this.dataBuffer);
     let newlineIndex: number;
 
     while ((newlineIndex = this.dataBuffer.indexOf('\n')) !== -1) {
       const line = this.dataBuffer.slice(0, newlineIndex).trim();
+      console.log('line :' + line);
       this.dataBuffer = this.dataBuffer.slice(newlineIndex + 1);
-
+      console.log('Databuffer (after) :' + this.dataBuffer);
       if (line) {
         const data = parseFloat(line);
         if (!isNaN(data)) {
