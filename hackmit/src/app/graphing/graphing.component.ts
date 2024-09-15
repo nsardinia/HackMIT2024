@@ -68,6 +68,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
               zeroline: false, // Hide the x-axis zero line
               showticklabels: false, // Hide the x-axis tick labels
             },
+            autosize: true, // Enable autosize to make the graph responsive
           }
         );
         resolve(); // Plotly loaded, resolve the Promise
