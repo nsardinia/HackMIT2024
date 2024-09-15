@@ -2,6 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 import { Call, StreamVideoClient, User } from '@stream-io/video-client';
 import { api_keys } from '../../public/API_keys';
 import { StreamChat, MessageResponse } from 'stream-chat';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,9 @@ export class CallingService {
 
   chatClient: StreamChat;
   sensorChannel: any;
+  private sensorDataSubject = new Subject<MessageResponse>();
+  sensorData$: Observable<MessageResponse> =
+    this.sensorDataSubject.asObservable();
 
   call = computed<Call | undefined>(() => {
     const currentCallId = this.callId();
@@ -44,33 +48,20 @@ export class CallingService {
   }
 
   // Create or join a channel for sensor data, returns a promise that resolves when ready
-  initializeSensorChannel(callId: string): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.sensorChannel = this.chatClient.channel('messaging', callId, {
-          name: 'Sensor Data Channel',
-        });
-        await this.sensorChannel.watch();
-        resolve();
-      } catch (error) {
-        console.error('Failed to initialize sensor channel:', error);
-        reject(error);
-      }
+  async initializeSensorChannel(callId: string): Promise<void> {
+    this.sensorChannel = this.chatClient.channel('messaging', callId, {
+      name: 'Sensor Data Channel',
     });
-  }
 
-  // Subscribe to sensor data messages with a callback
-  onSensorData(callback: (message: MessageResponse) => void) {
-    if (this.sensorChannel) {
-      this.sensorChannel.on(
-        'message.new',
-        (event: { message: MessageResponse }) => {
-          callback(event.message);
-        }
-      );
-    } else {
-      console.error('Sensor channel is not initialized.');
-    }
+    await this.sensorChannel.watch();
+
+    // Set up listener for new messages
+    this.sensorChannel.on(
+      'message.new',
+      (event: { message: MessageResponse }) => {
+        this.sensorDataSubject.next(event.message);
+      }
+    );
   }
 
   // Method to send sensor data from the patient

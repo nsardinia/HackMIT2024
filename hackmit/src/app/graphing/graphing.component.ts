@@ -1,4 +1,3 @@
-import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   Inject,
@@ -6,77 +5,75 @@ import {
   OnInit,
   PLATFORM_ID,
 } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { CallingService } from '../calling.service';
 import { MessageResponse } from 'stream-chat';
+import { Subscription } from 'rxjs';
 
 declare var Plotly: any;
 
 @Component({
   selector: 'app-graphing',
-  standalone: true,
   templateUrl: './graphing.component.html',
   styleUrl: './graphing.component.scss',
+  standalone: true,
+  imports: [CommonModule],
 })
 export class GraphingComponent implements OnInit, OnDestroy {
-  private intervalId: any;
+  private intervalId: any; // Interval identifier
   public array: number[] = [];
   private window: number[] = [];
   private windowLength = 30;
   private dataBuffer: string = '';
+
+  private dataSubscription: Subscription | undefined;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private callingService: CallingService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
-      this.loadPlotly();
+      // Ensure Plotly and the sensor channel are both ready
+      await this.loadPlotly();
 
-      // Wait for sensor channel to be initialized before subscribing
-      this.waitForSensorData();
+      this.dataSubscription = this.callingService.sensorData$.subscribe(
+        (data) => console.log(data)
+      );
     }
   }
 
-  async waitForSensorData(): Promise<void> {
-    try {
-      await this.callingService.initializeSensorChannel('1000'); // Or use the actual call ID
-      this.callingService.onSensorData((message: MessageResponse) => {
-        console.log('New sensor data received:', message.text);
-        this.handleIncomingData(message.text!);
-      });
-    } catch (error) {
-      console.error('Error initializing sensor channel:', error);
-    }
+  private loadPlotly(): Promise<void> {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+      script.onload = () => {
+        Plotly.newPlot('plot', [
+          {
+            y: [0],
+            mode: 'lines',
+            line: { color: '#80CAF6' },
+          },
+        ]);
+        resolve(); // Plotly loaded, resolve the Promise
+      };
+      document.head.appendChild(script);
+    });
   }
 
-  loadPlotly(): void {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
-    script.onload = () => {
-      Plotly.newPlot('plot', [
-        {
-          y: [0],
-          mode: 'lines',
-          line: { color: '#80CAF6' },
-        },
-      ]);
-    };
-    document.head.appendChild(script);
-  }
-
+  // Start updating the plot in real-time
   startRealtimeUpdate(): void {
     this.intervalId = setInterval(() => {
       this.updatePlot();
-    }, 1000);
+    }, 1000); // Update every second
   }
 
   updatePlot(): void {
-    const dataUpdate = {
+    const data_update = {
       y: [this.window],
     };
-
-    Plotly.update('plot', dataUpdate);
+    Plotly.update('plot', data_update);
   }
 
   handleIncomingData(chunk: string): void {
@@ -97,10 +94,10 @@ export class GraphingComponent implements OnInit, OnDestroy {
   }
 
   receiveData(data: number): void {
-    this.array = this.array.concat(data);
-    this.window = this.window.concat(data);
+    this.array.push(data);
+    this.window.push(data);
     if (this.window.length > this.windowLength) {
-      this.window.splice(0, 1);
+      this.window.shift();
     }
     if (this.array.length === this.windowLength) {
       this.startRealtimeUpdate();
