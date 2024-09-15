@@ -10,7 +10,7 @@ export class CallingService {
   callId = signal<string | undefined>(undefined);
 
   chatClient: StreamChat;
-  sensorChannel: any; // This will hold the messaging channel for sensor data
+  sensorChannel: any;
 
   call = computed<Call | undefined>(() => {
     const currentCallId = this.callId();
@@ -20,12 +20,9 @@ export class CallingService {
       call.join({ create: true }).then(async () => {
         call.camera.enable();
         call.microphone.enable();
-        this.initializeSensorChannel(currentCallId); // Initialize sensor data channel
+        this.initializeSensorChannel(currentCallId);
       });
-      this.chatClient.connectUser(
-        { id: api_keys.user }, // Current user (doctor or patient)
-        api_keys.token
-      );
+      this.chatClient.connectUser({ id: api_keys.user }, api_keys.token);
       return call;
     } else {
       return undefined;
@@ -46,9 +43,8 @@ export class CallingService {
     this.chatClient = new StreamChat(apiKey);
   }
 
-  // Create or join a channel for sensor data
+  // Initialize the channel for sensor data
   async initializeSensorChannel(callId: string) {
-    // You can use the callId as the channel ID for the sensor data
     this.sensorChannel = this.chatClient.channel('messaging', callId, {
       name: 'Sensor Data Channel',
     });
@@ -56,11 +52,23 @@ export class CallingService {
     await this.sensorChannel.watch();
   }
 
+  // Subscribe to sensor data messages with a callback
+  onSensorData(callback: (message: MessageResponse) => void) {
+    if (this.sensorChannel) {
+      this.sensorChannel.on(
+        'message.new',
+        (event: { message: MessageResponse }) => {
+          callback(event.message);
+        }
+      );
+    }
+  }
+
   // Method to send sensor data from the patient
   async sendSensorData(sensorData: string) {
     if (this.sensorChannel) {
       await this.sensorChannel.sendMessage({
-        text: sensorData, // Replace this with actual sensor data
+        text: sensorData,
       });
       console.log('Sensor data sent:', sensorData);
     }
