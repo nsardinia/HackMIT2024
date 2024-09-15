@@ -69,6 +69,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
               showticklabels: false, // Hide the x-axis tick labels
             },
             autosize: true, // Enable autosize to make the graph responsive
+            displayModeBar: false, // Hide all Plotly tools
           }
         );
         resolve(); // Plotly loaded, resolve the Promise
