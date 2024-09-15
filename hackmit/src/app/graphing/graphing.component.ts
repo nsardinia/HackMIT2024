@@ -60,7 +60,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
           ],
           {
             yaxis: {
-              range: [0, 180], // Set the y-axis range from 0 to 180
+              range: [0, 200], // Set the y-axis range from 0 to 200
             },
             xaxis: {
               showline: false, // Hide the x-axis line
