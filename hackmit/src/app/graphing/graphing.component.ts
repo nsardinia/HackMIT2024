@@ -23,7 +23,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
   private intervalId: any; // Interval identifier
   public array: number[] = [];
   private window: number[] = [];
-  private windowLength = 30;
+  private windowLength = 100;
   private dataBuffer: string = '';
 
   private dataSubscription: Subscription | undefined;
@@ -49,13 +49,27 @@ export class GraphingComponent implements OnInit, OnDestroy {
       const script = document.createElement('script');
       script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
       script.onload = () => {
-        Plotly.newPlot('plot', [
+        Plotly.newPlot(
+          'plot',
+          [
+            {
+              y: [0],
+              mode: 'lines',
+              line: { color: '#80CAF6' },
+            },
+          ],
           {
-            y: [0],
-            mode: 'lines',
-            line: { color: '#80CAF6' },
-          },
-        ]);
+            yaxis: {
+              range: [0, 180], // Set the y-axis range from 0 to 180
+            },
+            xaxis: {
+              showline: false, // Hide the x-axis line
+              showgrid: false, // Hide the x-axis grid
+              zeroline: false, // Hide the x-axis zero line
+              showticklabels: false, // Hide the x-axis tick labels
+            },
+          }
+        );
         resolve(); // Plotly loaded, resolve the Promise
       };
       document.head.appendChild(script);
