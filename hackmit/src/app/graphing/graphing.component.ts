@@ -86,7 +86,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
             margin: { l: 80, r: 80, t: 50, b: 50 }, // Increased margins
             yaxis: {
               title: 'Angle (degrees)',
-              range: [0, 180],
+              range: [0, 270],
               side: 'left',
               titlefont: { color: '#80CAF6' },
               tickfont: { color: '#80CAF6' },
