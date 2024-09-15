@@ -8,11 +8,14 @@ import { StreamChat, MessageResponse } from 'stream-chat';
 })
 export class CallingService {
   callId = signal<string | undefined>(undefined);
+
   chatClient: StreamChat;
   sensorChannel: any; // This will hold the messaging channel for sensor data
+
   call = computed<Call | undefined>(() => {
     const currentCallId = this.callId();
     if (currentCallId !== undefined) {
+      console.log('Hi');
       const call = this.client.call('default', currentCallId);
 
       call.join({ create: true }).then(async () => {
