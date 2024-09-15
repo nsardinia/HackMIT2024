@@ -45,13 +45,27 @@ export class GraphingComponent implements OnInit, OnDestroy {
     script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
     script.onload = () => {
       // Plotly script loaded, init the plot
-      Plotly.newPlot('plot', [
+      Plotly.newPlot(
+        'plot',
+        [
+          {
+            y: [0],
+            mode: 'lines',
+            line: { color: '#80CAF6' },
+          },
+        ],
         {
-          y: [0],
-          mode: 'lines',
-          line: { color: '#80CAF6' },
-        },
-      ]);
+          yaxis: {
+            range: [0, 200], // Set the y-axis range from 0 to 180
+          },
+          xaxis: {
+            showline: false, // Hide the x-axis line
+            showgrid: false, // Hide the x-axis grid
+            zeroline: false, // Hide the x-axis zero line
+            showticklabels: false, // Hide the x-axis tick labels
+          },
+        }
+      );
     };
     document.head.appendChild(script);
   }
