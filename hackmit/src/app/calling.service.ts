@@ -20,7 +20,7 @@ export class CallingService {
       call.join({ create: true }).then(async () => {
         call.camera.enable();
         call.microphone.enable();
-        this.initializeSensorChannel(currentCallId);
+        await this.initializeSensorChannel(currentCallId);
       });
       this.chatClient.connectUser({ id: api_keys.user }, api_keys.token);
       return call;
@@ -43,13 +43,20 @@ export class CallingService {
     this.chatClient = new StreamChat(apiKey);
   }
 
-  // Initialize the channel for sensor data
-  async initializeSensorChannel(callId: string) {
-    this.sensorChannel = this.chatClient.channel('messaging', callId, {
-      name: 'Sensor Data Channel',
+  // Create or join a channel for sensor data, returns a promise that resolves when ready
+  initializeSensorChannel(callId: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.sensorChannel = this.chatClient.channel('messaging', callId, {
+          name: 'Sensor Data Channel',
+        });
+        await this.sensorChannel.watch();
+        resolve();
+      } catch (error) {
+        console.error('Failed to initialize sensor channel:', error);
+        reject(error);
+      }
     });
-
-    await this.sensorChannel.watch();
   }
 
   // Subscribe to sensor data messages with a callback
@@ -61,6 +68,8 @@ export class CallingService {
           callback(event.message);
         }
       );
+    } else {
+      console.error('Sensor channel is not initialized.');
     }
   }
 

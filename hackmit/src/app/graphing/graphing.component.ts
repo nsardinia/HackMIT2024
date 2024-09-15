@@ -33,11 +33,20 @@ export class GraphingComponent implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       this.loadPlotly();
 
-      // Register the callback to handle new sensor data
+      // Wait for sensor channel to be initialized before subscribing
+      this.waitForSensorData();
+    }
+  }
+
+  async waitForSensorData(): Promise<void> {
+    try {
+      await this.callingService.initializeSensorChannel('1000'); // Or use the actual call ID
       this.callingService.onSensorData((message: MessageResponse) => {
         console.log('New sensor data received:', message.text);
         this.handleIncomingData(message.text!);
       });
+    } catch (error) {
+      console.error('Error initializing sensor channel:', error);
     }
   }
 
@@ -71,8 +80,6 @@ export class GraphingComponent implements OnInit, OnDestroy {
   }
 
   handleIncomingData(chunk: string): void {
-    console.log(chunk);
-
     this.dataBuffer += chunk;
     let newlineIndex: number;
 
@@ -82,7 +89,6 @@ export class GraphingComponent implements OnInit, OnDestroy {
 
       if (line) {
         const data = parseFloat(line);
-        console.log(data);
         if (!isNaN(data)) {
           this.receiveData(data);
         }
