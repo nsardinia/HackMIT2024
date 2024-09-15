@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { CallingService } from '../calling.service';
-import { MessageResponse } from 'stream-chat';
 import { Subscription } from 'rxjs';
 
 declare var Plotly: any;
@@ -20,13 +19,22 @@ declare var Plotly: any;
   imports: [CommonModule],
 })
 export class GraphingComponent implements OnInit, OnDestroy {
-  private intervalId: any; // Interval identifier
+  private intervalId: any;
   public array: number[] = [];
-  private window: number[] = [];
+  private angleWindow: number[] = [];
+  private velocityWindow: number[] = [];
+  private accelerationWindow: number[] = [];
   private windowLength = 100;
   private dataBuffer: string = '';
 
+  angularVelocity: Array<number> = [];
+  angularAcceleration: Array<number> = [];
+
   private dataSubscription: Subscription | undefined;
+
+  private lastAngle: number | null = null;
+  private lastVelocity: number | null = null;
+  private lastTimestamp: number | null = null;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -35,7 +43,6 @@ export class GraphingComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
-      // Ensure Plotly and the sensor channel are both ready
       await this.loadPlotly();
 
       this.dataSubscription = this.callingService.sensorData$.subscribe(
@@ -56,39 +63,86 @@ export class GraphingComponent implements OnInit, OnDestroy {
               y: [0],
               mode: 'lines',
               line: { color: '#80CAF6' },
+              name: 'Angle',
+              yaxis: 'y',
+            },
+            {
+              y: [0],
+              mode: 'lines',
+              line: { color: '#FF6347' },
+              name: 'Angular Velocity (degrees/s)',
+              yaxis: 'y2',
+            },
+            {
+              y: [0],
+              mode: 'lines',
+              line: { color: '#32CD32' },
+              name: 'Angular Acceleration (degrees/s^2)',
+              yaxis: 'y3',
             },
           ],
           {
+            height: 450, // Increased height
+            margin: { l: 80, r: 80, t: 50, b: 50 }, // Increased margins
             yaxis: {
-              range: [0, 200], // Set the y-axis range from 0 to 200
+              title: 'Angle (degrees)',
+              range: [0, 180],
+              side: 'left',
+              titlefont: { color: '#80CAF6' },
+              tickfont: { color: '#80CAF6' },
+              zeroline: false,
+            },
+            yaxis2: {
+              overlaying: 'y',
+              side: 'right',
+              position: 1, // Moved to the far right
+              titlefont: { color: '#FF6347' },
+              tickfont: { color: '#FF6347' },
+              zeroline: false,
+            },
+            yaxis3: {
+              overlaying: 'y',
+              side: 'right',
+              position: 1,
+              titlefont: { color: '#32CD32' },
+              tickfont: { color: '#32CD32' },
+              zeroline: false,
             },
             xaxis: {
-              showline: false, // Hide the x-axis line
-              showgrid: false, // Hide the x-axis grid
-              zeroline: false, // Hide the x-axis zero line
-              showticklabels: false, // Hide the x-axis tick labels
+              showline: true,
+              showgrid: true,
+              zeroline: true,
+              showticklabels: true,
+              title: 'Time',
+              domain: [0.1, 0.9], // Adjust x-axis domain to make room for y-axes
             },
-            autosize: true, // Enable autosize to make the graph responsive
-            displayModeBar: false, // Hide all Plotly tools
+            showlegend: true,
+            legend: {
+              x: 0,
+              y: 1.15,
+              orientation: 'h',
+              traceorder: 'normal',
+            },
           }
         );
-        resolve(); // Plotly loaded, resolve the Promise
+        resolve();
       };
       document.head.appendChild(script);
     });
   }
 
-  // Start updating the plot in real-time
   startRealtimeUpdate(): void {
     this.intervalId = setInterval(() => {
       this.updatePlot();
-    }, 1000); // Update every second
+    }, 1000);
   }
 
   updatePlot(): void {
-    const data_update = {
-      y: [this.window],
-    };
+    const data_update = [
+      { y: [this.angleWindow] },
+      { y: [this.velocityWindow] },
+      { y: [this.accelerationWindow] },
+    ];
     Plotly.update('plot', data_update);
   }
 
@@ -123,10 +177,36 @@ export class GraphingComponent implements OnInit, OnDestroy {
     this.callingService.avgAngle += data;
     this.callingService.avgAngle /= 2;
 
+    const currentTime = Date.now();
+    if (this.lastAngle !== null && this.lastTimestamp !== null) {
+      const deltaTime = (currentTime - this.lastTimestamp) / 1000; // Convert to seconds
+      const angularVelocity = (data - this.lastAngle) / deltaTime;
+
+      if (this.lastVelocity !== null) {
+        const angularAcceleration =
+          (angularVelocity - this.lastVelocity) / deltaTime;
+        this.angularAcceleration.push(angularAcceleration);
+        this.accelerationWindow.push(angularAcceleration);
+        if (this.accelerationWindow.length > this.windowLength) {
+          this.accelerationWindow.shift();
+        }
+      }
+
+      this.angularVelocity.push(angularVelocity);
+      this.velocityWindow.push(angularVelocity);
+      if (this.velocityWindow.length > this.windowLength) {
+        this.velocityWindow.shift();
+      }
+      this.lastVelocity = angularVelocity;
+    }
+
+    this.lastAngle = data;
+    this.lastTimestamp = currentTime;
+
     this.array.push(data);
-    this.window.push(data);
-    if (this.window.length > this.windowLength) {
-      this.window.shift();
+    this.angleWindow.push(data);
+    if (this.angleWindow.length > this.windowLength) {
+      this.angleWindow.shift();
     }
     if (this.array.length === this.windowLength) {
       this.startRealtimeUpdate();
@@ -135,5 +215,8 @@ export class GraphingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
+    if (this.dataSubscription) {
+      this.dataSubscription.unsubscribe();
+    }
   }
 }
