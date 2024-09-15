@@ -10,7 +10,6 @@ import {
 import { CallingService } from './calling.service';
 import { CommonModule } from '@angular/common';
 import { CallComponent } from './call/call.component';
-import { BluetoothComponent } from './bluetooth/bluetooth.component';
 import {
   Component,
   Inject,
@@ -21,6 +20,7 @@ import {
 import { Subscription } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { SerialService } from './serial.service';
+import { GraphingComponent } from './graphing/graphing.component';
 
 @Component({
   selector: 'app-root',
@@ -32,7 +32,7 @@ import { SerialService } from './serial.service';
     StreamAutocompleteTextareaModule,
     StreamChatModule,
     CallComponent,
-    BluetoothComponent,
+    GraphingComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

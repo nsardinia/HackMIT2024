@@ -28,8 +28,8 @@
         </div>
       </div>
       <div class="text-center">
-        <span class="mr-2">Join meeting</span>
-        <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="setCallId('1000'); setNameId('Patient')">Join</button>
+        <span class="mr-2">{{isConnected ? 'Join meeting' : 'Needed to connect device'}}</span>
+        <button class="px-4 py-2 rounded text-white bg-blue-500" (click)="setCallId('1000'); setNameId('Patient')" [ngClass]="{'hidden' : !isConnected}">Join</button>
       </div>
     </div>
   </body>
@@ -48,5 +48,6 @@
 </section>
 <section *ngIf="callingService.call()">
   <app-call [call]="callingService.call()!"></app-call>
+  <app-graphing></app-graphing>
 </section>
 <router-outlet />
