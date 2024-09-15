@@ -39,7 +39,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
       await this.loadPlotly();
 
       this.dataSubscription = this.callingService.sensorData$.subscribe(
-        (data) => console.log(data)
+        (data) => this.handleIncomingData(data.text!)
       );
     }
   }
