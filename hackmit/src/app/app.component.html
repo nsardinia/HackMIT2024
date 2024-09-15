@@ -33,9 +33,6 @@
       </div>
     </div>
   </body>
-  <section *ngIf="callingService.call()">
-    <app-call [call]="callingService.call()!"></app-call>
-  </section>
   <ul class="background">
     <li></li>
     <li></li>
@@ -48,5 +45,8 @@
     <li></li>
     <li></li>
   </ul>
-  <router-outlet />
 </section>
+<section *ngIf="callingService.call()">
+  <app-call [call]="callingService.call()!"></app-call>
+</section>
+<router-outlet />
