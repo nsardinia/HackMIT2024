@@ -105,3 +105,17 @@
   bottom: -196px;
   animation-delay: 10s;
 }
+.video-section {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+.graph-section {
+  flex: 1;
+  padding: 20px;
+  border-left: 1px solid #ccc;
+}
+.conference{
+  display: flex;
+  height: 100vh;
+}

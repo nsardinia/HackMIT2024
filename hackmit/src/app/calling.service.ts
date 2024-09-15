@@ -15,7 +15,6 @@ export class CallingService {
   call = computed<Call | undefined>(() => {
     const currentCallId = this.callId();
     if (currentCallId !== undefined) {
-      console.log('Hi');
       const call = this.client.call('default', currentCallId);
 
       call.join({ create: true }).then(async () => {
@@ -55,15 +54,6 @@ export class CallingService {
     });
 
     await this.sensorChannel.watch();
-
-    // Listen for incoming sensor data
-    this.sensorChannel.on(
-      'message.new',
-      (event: { message: MessageResponse }) => {
-        console.log('New sensor data received:', event.message.text);
-        // Handle the received sensor data (e.g., display it on the doctor’s dashboard)
-      }
-    );
   }
 
   // Method to send sensor data from the patient

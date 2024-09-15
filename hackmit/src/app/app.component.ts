@@ -39,10 +39,6 @@ import { GraphingComponent } from './graphing/graphing.component';
 })
 export class AppComponent implements OnInit, OnDestroy {
   callingService: CallingService;
-  private dataSubject = new Subject<string>();
-  private dataSubscription: Subscription;
-  private bufferSubject = new Subject<void>();
-  private readonly CHUNK_INTERVAL = 1000; // 1 second
 
   constructor(
     callingService: CallingService,
@@ -50,23 +46,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private serialService: SerialService
   ) {
     this.callingService = callingService;
-
-    // Set up throttled data sending
-    this.dataSubscription = this.dataSubject
-      .pipe(buffer(this.bufferSubject), debounceTime(50))
-      .subscribe((dataChunk) => {
-        if (dataChunk.length > 0) {
-          const combineData = dataChunk.join('\n');
-          callingService.sendSensorData(combineData);
-        }
-      });
-
-    // Trigger buffer flush every CHUNK_INTERVAL
-    timer(0, this.CHUNK_INTERVAL).subscribe(() => this.bufferSubject.next());
-
-    serialService.data$.subscribe((data) => {
-      this.dataSubject.next(data.toString());
-    });
   }
 
   setCallId(callId: string) {
@@ -103,9 +82,6 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.connectionSubscription) {
       this.connectionSubscription.unsubscribe();
-    }
-    if (this.dataSubscription) {
-      this.dataSubscription.unsubscribe();
     }
   }
 

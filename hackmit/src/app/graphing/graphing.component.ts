@@ -7,6 +7,8 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { SerialService } from '../serial.service';
+import { CallingService } from '../calling.service';
+import { MessageResponse } from 'stream-chat';
 
 declare var Plotly: any;
 
@@ -22,14 +24,21 @@ export class GraphingComponent implements OnInit, OnDestroy {
   public array: number[] = [];
   private window: number[] = [];
   private windowLength = 30;
+  private dataBuffer: string = '';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private serialService: SerialService
+    private callingService: CallingService
   ) {
-    serialService.data$.subscribe((data) => {
-      this.receiveData(data);
-    });
+    // Listen for incoming sensor data
+    callingService.sensorChannel.on(
+      'message.new',
+      (event: { message: MessageResponse }) => {
+        console.log('New sensor data received:', event.message.text);
+        // Handle the received sensor data (e.g., display it on the doctor’s dashboard)
+        this.handleIncomingData(event.message.text!);
+      }
+    );
   }
 
   ngOnInit(): void {
@@ -69,6 +78,23 @@ export class GraphingComponent implements OnInit, OnDestroy {
     };
 
     Plotly.update('plot', data_update);
+  }
+
+  handleIncomingData(chunk: string): void {
+    this.dataBuffer += chunk;
+    let newlineIndex: number;
+
+    while ((newlineIndex = this.dataBuffer.indexOf('\n')) !== -1) {
+      const line = this.dataBuffer.slice(0, newlineIndex).trim();
+      this.dataBuffer = this.dataBuffer.slice(newlineIndex + 1);
+
+      if (line) {
+        const data = parseFloat(line);
+        if (!isNaN(data)) {
+          this.receiveData(data);
+        }
+      }
+    }
   }
 
   receiveData(data: number): void {

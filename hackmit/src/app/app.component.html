@@ -4,32 +4,8 @@
     
     <div class="bg-white p-4 rounded shadow-md w-96">
       <h1 class="text-center text-2xl font-bold mb-6">Prepare for Your Appointment</h1>
-      <div class="border p-4 mb-6">
-        <div class="flex items-center justify-between mb-4">
-          <span>1. Pair the device</span>
-          <button (click)="toggleDropdown('dropdown1')" class="relative">
-            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-          </button>
-        </div>
-        <div id="dropdown1" [ngClass]="{'hidden': !isDropdownOpen['dropdown1']}" class="mb-4">
-          <p class="text-gray-600">If this is your first meeting, open settings. Go to Bluetooth settings. Look for Freddy. Connect/Pair with device. </p>
-        </div>
-        <div class="flex items-center justify-between mb-1">
-          <span>2. Select device</span>
-          <div class="relative">
-            <button class="bg-blue-500 text-white px-2 py-1 rounded" (click)="open()">Select</button>
-            <button (click)="toggleDropdown('dropdown2')" class="relative ml-2">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-            </button>
-          </div>
-        </div>
-        <div id="dropdown2" [ngClass]="{'hidden': !isDropdownOpen['dropdown2']}" class="mb-4">
-          <p class="text-gray-600">Click on the select button and choose Freddy.</p>
-        </div>
-      </div>
       <div class="text-center">
-        <span class="mr-2">{{isConnected ? 'Join meeting' : 'Needed to connect device'}}</span>
-        <button class="px-4 py-2 rounded text-white bg-blue-500" (click)="setCallId('1000'); setNameId('Patient')" [ngClass]="{'hidden' : !isConnected}">Join</button>
+        <button class="px-4 py-2 rounded text-white bg-blue-500" (click)="setCallId('1000'); setNameId('Doctor')">Join Meeting</button>
       </div>
     </div>
   </body>
@@ -47,7 +23,13 @@
   </ul>
 </section>
 <section *ngIf="callingService.call()">
-  <app-call [call]="callingService.call()!"></app-call>
-  <app-graphing ></app-graphing>
+  <div class="conference">
+    <div class="video-section">
+      <app-call [call]="callingService.call()!"></app-call>
+    </div>
+    <div class="graph-section">
+      <app-graphing></app-graphing>
+    </div>
+  </div>
 </section>
 <router-outlet />
