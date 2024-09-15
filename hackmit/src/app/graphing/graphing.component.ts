@@ -78,7 +78,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
 
   handleIncomingData(chunk: string): void {
     console.log('Incoming chunk: ' + chunk);
-    this.dataBuffer += chunk;
+    this.dataBuffer += '\n' + chunk;
     console.log('Databuffer (before) :' + this.dataBuffer);
     let newlineIndex: number;
 
