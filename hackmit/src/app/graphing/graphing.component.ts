@@ -71,6 +71,8 @@ export class GraphingComponent implements OnInit, OnDestroy {
   }
 
   handleIncomingData(chunk: string): void {
+    console.log(chunk);
+
     this.dataBuffer += chunk;
     let newlineIndex: number;
 
@@ -80,6 +82,7 @@ export class GraphingComponent implements OnInit, OnDestroy {
 
       if (line) {
         const data = parseFloat(line);
+        console.log(data);
         if (!isNaN(data)) {
           this.receiveData(data);
         }
