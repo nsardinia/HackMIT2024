@@ -21,6 +21,7 @@ import { debounceTime, Subject, buffer, Subscription, timer } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { SerialService } from './serial.service';
 import { GraphingComponent } from './graphing/graphing.component';
+import { StatsComponent } from './stats/stats.component';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +34,7 @@ import { GraphingComponent } from './graphing/graphing.component';
     StreamChatModule,
     CallComponent,
     GraphingComponent,
+    StatsComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

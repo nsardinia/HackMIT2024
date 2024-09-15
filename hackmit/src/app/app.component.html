@@ -27,9 +27,14 @@
     <div class="video-section">
       <app-call [call]="callingService.call()!"></app-call>
     </div>
-    <div class="graph-section">
-      <app-graphing></app-graphing>
+    <div class="column-section">
+      <div class="graph-section">
+        <app-graphing></app-graphing>
+      </div>
+      <div class="stats-section">
+        <app-stats></app-stats>
+      </div>
     </div>
-  </div>
+  </div>  
 </section>
 <router-outlet />

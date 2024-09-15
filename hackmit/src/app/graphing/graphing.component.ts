@@ -113,6 +113,16 @@ export class GraphingComponent implements OnInit, OnDestroy {
   }
 
   receiveData(data: number): void {
+    if (this.callingService.maxAngle < data) {
+      this.callingService.maxAngle = data;
+    }
+    if (this.callingService.minAngle > data) {
+      this.callingService.minAngle = data;
+    }
+
+    this.callingService.avgAngle += data;
+    this.callingService.avgAngle /= 2;
+
     this.array.push(data);
     this.window.push(data);
     if (this.window.length > this.windowLength) {

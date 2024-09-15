@@ -10,6 +10,10 @@ import { Observable, Subject } from 'rxjs';
 export class CallingService {
   callId = signal<string | undefined>(undefined);
 
+  maxAngle: number = 0;
+  minAngle: number = 181;
+  avgAngle: number = 0;
+
   chatClient: StreamChat;
   sensorChannel: any;
   private sensorDataSubject = new Subject<MessageResponse>();
